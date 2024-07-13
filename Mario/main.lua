@@ -13,19 +13,18 @@ function love.load()
   player.yVelocity = 0
   player.isJumping = false
   player.speed = 200
-
+  player.collect = false
   gravity = 500
   jumpForce = -300
+  player.coin=0
+
+  coin={}
+  coin.image = love.graphics.newImage("Images/coin.png")
+  coin.x= love.math.random(tonumber(1000))
+  coin.y= 400
 end
 
-function love.draw()
-  love.graphics.draw(player.image, player.x, player.y)
 
-  for _, platform in ipairs(platforms) do
-        love.graphics.rectangle("fill", platform.x, platform.y, platform.width, platform.height)
-        
-  end
-end
 
 function checkCollision(player, platform)
     
@@ -40,6 +39,14 @@ function checkCollision(player, platform)
 end
 
 function love.update(dt)
+
+    --coin collection
+    if player.x >= coin.x +1 then
+
+        player.collect=true
+        
+    end
+
   -- Handle left and right movement
   if love.keyboard.isDown("right") then
       player.x = player.x + player.speed * dt
@@ -83,3 +90,21 @@ function love.update(dt)
       player.y = player.y - player.speed * dt
   end
 end
+
+
+function love.draw()
+    love.graphics.draw(player.image, player.x, player.y)
+  
+  
+    if not player.collect then
+   love.graphics.draw(coin.image,coin.x,coin.y)
+    end
+    if player.collect==true then
+        love.graphics.print(player.coin + 1, 10 , 10)
+    end
+    for _, platform in ipairs(platforms) do
+          love.graphics.rectangle("fill", platform.x, platform.y, platform.width, platform.height)
+          
+    end
+  end
+
