@@ -1,9 +1,8 @@
+_G.love = require('love')
 function love.load()
-  -- Set the window size
-  love.window.setMode(800, 600)
-
+  
   platforms = {
-      {x = 0, y = 550, width = 800, height = 50}
+      {x = 0, y = 550, width = 1200 , height = 50}
   }
 
   -- Load the player image
@@ -23,11 +22,13 @@ function love.draw()
   love.graphics.draw(player.image, player.x, player.y)
 
   for _, platform in ipairs(platforms) do
-      love.graphics.rectangle("fill", platform.x, platform.y, platform.width, platform.height)
+        love.graphics.rectangle("fill", platform.x, platform.y, platform.width, platform.height)
+        
   end
 end
 
 function checkCollision(player, platform)
+    
   if player.x < platform.x + platform.width and
      player.x + player.image:getWidth() > platform.x and
      player.y < platform.y + platform.height and
