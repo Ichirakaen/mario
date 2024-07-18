@@ -89,6 +89,9 @@ function love.update(dt)
   if love.keyboard.isDown("up") then
       player.y = player.y - player.speed * dt
   end
+
+  
+
 end
 
 
