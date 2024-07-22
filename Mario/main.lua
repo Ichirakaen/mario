@@ -13,7 +13,6 @@ function love.load()
   player.yVelocity = 0
   player.isJumping = false
   player.speed = 200
-  player.collect = false
   gravity = 500
   jumpForce = -300
   player.coin=0
@@ -22,6 +21,12 @@ function love.load()
   coin.image = love.graphics.newImage("Images/coin.png")
   coin.x= love.math.random(tonumber(1000))
   coin.y= 400
+
+  groundImage = love.graphics.newImage("Images/tile.png")
+  --aba yo chai for camera
+  cameraX = 0
+  cameraY = 0
+
 end
 
 
@@ -38,14 +43,20 @@ function checkCollision(player, platform)
   end
 end
 
+function checkCoinCollision(player, coin)
+    if player.x < coin.x + coin.image:getWidth() and
+       player.x + player.image:getWidth() > coin.x and
+       player.y < coin.y + coin.image:getHeight() and
+       player.y + player.image:getHeight() > coin.y then
+        return true
+    else
+        return false
+    end
+end
+
+
 function love.update(dt)
 
-    --coin collection
-    if player.x >= coin.x +1 then
-
-        player.collect=true
-        
-    end
 
   -- Handle left and right movement
   if love.keyboard.isDown("right") then
@@ -53,6 +64,13 @@ function love.update(dt)
   elseif love.keyboard.isDown("left") then
       player.x = player.x - player.speed * dt
   end
+  
+  -- Define screen center positions
+local screenWidth = love.graphics.getWidth()
+local screenHeight = love.graphics.getHeight()
+
+-- Update camera position based on player position
+
 
   -- Apply gravity
   player.yVelocity = player.yVelocity + gravity * dt
@@ -90,24 +108,57 @@ function love.update(dt)
       player.y = player.y - player.speed * dt
   end
 
-  
+   
+    -- Define screen center positions
+    local screenWidth = love.graphics.getWidth()
+    local screenHeight = love.graphics.getHeight()
 
+    -- Update camera position based on player position
+    cameraX = player.x - screenWidth / 2
+    cameraY = player.y - screenHeight / 2
+
+    -- Check for coin collection
+    if checkCoinCollision(player, coin) then
+        player.coin = player.coin + 1
+
+        -- Respawn the coin at a new random position
+        coin.x = love.math.random(50, 1150)
+        coin.y = love.math.random(50, 550)
+
+        -- Debug prints
+        print("Coin collected! New position: ", coin.x, coin.y)
+    end
+
+    -- Debug prints for player and coin positions
+    print("Player position: ", player.x, player.y)
+    print("Coin position:   ", coin.x, coin.y)
 end
+    
 
 
 function love.draw()
+    love.graphics.push()  -- Save the current transformation state
+    love.graphics.translate(-cameraX, -cameraY)
+
+    -- Draw everything with the camera offset applied
     love.graphics.draw(player.image, player.x, player.y)
-  
-  
+
     if not player.collect then
-   love.graphics.draw(coin.image,coin.x,coin.y)
+        love.graphics.draw(coin.image, coin.x, coin.y)
     end
-    if player.collect==true then
-        love.graphics.print(player.coin + 1, 10 , 10)
-    end
-    for _, platform in ipairs(platforms) do
-          love.graphics.rectangle("fill", platform.x, platform.y, platform.width, platform.height)
-          
-    end
-  end
+
+    love.graphics.print("Coins: " .. player.coin, 10 + cameraX, 10 + cameraY)
+    
+     -- Draw the ground
+     local groundHeight = love.graphics.getHeight() - groundImage:getHeight()
+     for i = 0, math.ceil(love.graphics.getWidth() / groundImage:getWidth()) do
+         love.graphics.draw(groundImage, i * groundImage:getWidth(), groundHeight)
+     end
+--aile ko lagi as platform isnt ready
+ --   for _, platform in ipairs(platforms) do
+   --     love.graphics.rectangle("fill", platform.x, platform.y, platform.width, platform.height)
+    --end
+
+    love.graphics.pop()  -- Restore the previous transformation state
+end
 
