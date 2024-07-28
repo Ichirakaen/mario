@@ -13,14 +13,15 @@ function love.load()
   player.yVelocity = 0
   player.isJumping = false
   player.speed = 200
-  gravity = 500
-  jumpForce = -300
+  gravity = 800
+  jumpForce = -400
   player.coin=0
 
   coin={}
   coin.image = love.graphics.newImage("Images/coin.png")
   coin.x= love.math.random(tonumber(1000))
-  coin.y= 400
+  coin.y= 460
+  coin.height = 200
 
   groundImage = love.graphics.newImage("Images/tile.png")
   --aba yo chai for camera
@@ -114,16 +115,17 @@ local screenHeight = love.graphics.getHeight()
     local screenHeight = love.graphics.getHeight()
 
     -- Update camera position based on player position
-    cameraX = player.x - screenWidth / 2
-    cameraY = player.y - screenHeight / 2
+    cameraX = cameraX + (player.x - screenWidth / 2 - cameraX) * dt * 5
+    cameraY = cameraY + (player.y - screenHeight / 2 - cameraY) * dt * 5
+
 
     -- Check for coin collection
     if checkCoinCollision(player, coin) then
         player.coin = player.coin + 1
 
         -- Respawn the coin at a new random position
-        coin.x = love.math.random(50, 1150)
-        coin.y = love.math.random(50, 550)
+        coin.x = love.math.random(50, 1000)
+        coin.height = love.math.random(50, 60 )
 
         -- Debug prints
         print("Coin collected! New position: ", coin.x, coin.y)
